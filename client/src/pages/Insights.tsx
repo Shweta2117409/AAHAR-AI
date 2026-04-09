@@ -4,12 +4,6 @@ import { useAaharStore } from '../state/AaharStore'
 
 type Datum = { name: string; value: number }
 
-const mealTimeDistribution: Datum[] = [
-  { name: 'Breakfast', value: 30 },
-  { name: 'Lunch', value: 40 },
-  { name: 'Dinner', value: 30 },
-]
-
 function toPercentSlices(counts: Record<string, number>, order: string[]) {
   const total = order.reduce((acc, k) => acc + (counts[k] ?? 0), 0)
   if (total <= 0) return order.map((name) => ({ name, value: 0 }))
@@ -117,7 +111,6 @@ export default function Insights() {
       ] satisfies Datum[],
       insights: {
         junk: 'You are mostly choosing healthy meals. Keep it consistent.',
-        meal: 'Your meals are fairly balanced across the day.',
         protein: 'Protein intake looks moderate overall.',
       },
     }
@@ -157,11 +150,6 @@ export default function Insights() {
           ? 'You are mostly choosing healthy meals. Keep it consistent.'
           : 'Your junk vs healthy split is balanced.'
 
-    const dominantMeal = mealTimeDistribution.reduce((best, cur) =>
-      cur.value > best.value ? cur : best
-    )
-    const mealInsight = `Your meals are mostly ${dominantMeal.name.toLowerCase()}-heavy.`
-
     const proteinInsight =
       level === 'Low'
         ? 'Protein intake is low. Add dal, paneer, or sprouts.'
@@ -172,7 +160,7 @@ export default function Insights() {
     return {
       junkVsHealthy,
       proteinDistribution,
-      insights: { junk: junkInsight, meal: mealInsight, protein: proteinInsight },
+      insights: { junk: junkInsight, protein: proteinInsight },
     }
   }, [lastRawTotals?.protein, lastSelectedFoodsByCategory])
 
@@ -183,20 +171,13 @@ export default function Insights() {
         Based on your recent food selections
       </p>
 
-      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="mt-8 mx-auto grid max-w-4xl grid-cols-1 gap-6 lg:grid-cols-2">
         <ChartCard
           title="Junk vs Healthy"
           subtitle="Based on your latest selections"
           data={junkVsHealthy}
           colors={['#22c55e', '#fb7185']}
           insight={insights.junk}
-        />
-        <ChartCard
-          title="Meal Timing"
-          subtitle="Sample distribution (no backend yet)"
-          data={mealTimeDistribution}
-          colors={['#38bdf8', '#f97316', '#a78bfa']}
-          insight={insights.meal}
         />
         <ChartCard
           title="Protein Distribution"
